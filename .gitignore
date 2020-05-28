@@ -1,3 +1,9 @@
+# Files
+vault.yaml
+*.txt
+config.vagrant
+join-command
+
 # Logs
 logs
 *.log

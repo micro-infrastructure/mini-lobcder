@@ -1,0 +1,76 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: Install packages that allow apt to be used over HTTPS
+    apt:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - git
+  
+  - name: Create vault file
+    local_action: shell ./genVault.sh
+    become: false
+
+  - name: Copy vault file
+    copy:
+        src: ./vault.yaml
+        dest: /home/vagrant/vault.yaml
+  
+  - name: Setup core-process ns
+    become: false
+    command: kubectl create ns process-core
+  
+  - name: Install vault
+    become: false
+    command: kubectl apply -f /home/vagrant/vault.yaml
+
+  - name: Pull core-infra
+    become: false
+    git:
+      repo: https://github.com/micro-infrastructure/core-infra.git
+      version: 0.2.1
+      dest: /home/vagrant/core-infra
+      force: true
+
+  - name: Remove nodeSelector from core-infra yaml for local - 1
+    become: false
+    lineinfile:
+        path: /home/vagrant/core-infra/core-infra.yaml
+        regexp: 'nodeSelector:'
+        line: ''
+  
+  - name: Remove nodeSelector from core-infra yaml for local - 2
+    become: false
+    lineinfile:
+        path: /home/vagrant/core-infra/core-infra.yaml
+        regexp: 'type\: core'
+        line: ''
+  
+  - name: Change host in core-infra yaml for local
+    become: false
+    replace:
+        path: /home/vagrant/core-infra/core-infra.yaml
+        regexp: 'lobcder.process-project.eu'
+        replace: '192.168.50.10'
+
+  - name: Pull core-mongo
+    git:
+      repo: https://github.com/micro-infrastructure/core-mongo.git
+      version: 0.1.0
+      dest: /home/vagrant/core-mongo
+
+  - name: Deploy core-mongo
+    become: False
+    command: kubectl create -f /home/vagrant/core-mongo/core-mongo-no-pv-mini.yaml
+
+  - name: Wait for mongo up
+    become: False
+    command: sleep 30
+
+  - name: Deploy core-infra
+    become: False
+    command: kubectl create -f /home/vagrant/core-infra/core-infra.yaml
