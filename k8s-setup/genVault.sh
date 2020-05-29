@@ -10,7 +10,9 @@ if [ ! -f privateKey.txt ]; then
 	rm *.pem
 fi
 
-echo "generating vault.yaml file!"
+echo "generating vault.yaml file"
+#IDRSAFILE="process_id_rsa_$(md5sum privateKey.txt | awk '{print $1}')"
+#IDRSAFILE64="$(echo $IDRSAFILE | tr -d '\n' | base64)"
 DBPASS="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo '')"
 DBPASS64="$(echo $DBPASS | tr -d '\n' |  base64 | tr -d '\n')"
 DBROOTPASS="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo '')"
@@ -26,6 +28,7 @@ cp vault.yaml.template vault.yaml.new
 sed -i "s/#DBPASS#/$DBPASS64/g" vault.yaml.new
 sed -i "s/#DBUSER#/$DBUSER/g" vault.yaml.new
 sed -i "s/#DB-ROOT-PASS#/$DBROOTPASS64/g" vault.yaml.new
+#sed -i "s/#IDRSAFILE#/$IDRSAFILE64/g" vault.yaml.new
 sed -i "s/#PRIVATEKEY.TXT#/$PRIV/g" vault.yaml.new
 sed -i "s/#PUBLICKEY.TXT#/$PUB/g" vault.yaml.new
 sed -i "s/#CERTIFICATE.TXT#/$CERT/g" vault.yaml.new

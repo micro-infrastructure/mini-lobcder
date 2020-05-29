@@ -32,7 +32,7 @@
     become: false
     git:
       repo: https://github.com/micro-infrastructure/core-infra.git
-      version: 0.2.1
+      version: 0.2.2
       dest: /home/vagrant/core-infra
       force: true
 
