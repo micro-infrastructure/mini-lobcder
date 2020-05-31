@@ -3,6 +3,8 @@ vault.yaml
 *.txt
 config.vagrant
 join-command
+*.json
+adminToken
 
 # Logs
 logs

@@ -2,7 +2,7 @@
 - hosts: all
   become: true
   tasks:
-  - name: Install packages that allow apt to be used over HTTPS
+  - name: Install packages to deploy core pods
     apt:
       name: "{{ packages }}"
       state: present
@@ -32,7 +32,7 @@
     become: false
     git:
       repo: https://github.com/micro-infrastructure/core-infra.git
-      version: 0.2.2
+      version: master
       dest: /home/vagrant/core-infra
       force: true
 
@@ -69,8 +69,95 @@
 
   - name: Wait for mongo up
     become: False
-    command: sleep 30
+    command: kubectl wait -n process-core --for=condition=Ready pod/core-mongo --timeout=360s
 
   - name: Deploy core-infra
     become: False
     command: kubectl create -f /home/vagrant/core-infra/core-infra.yaml
+
+  - name: Get core-infra pod name
+    become: false
+    shell: kubectl get pods -n process-core | grep core-infra | awk '{print $1}'
+    register: core_infra
+  
+  - name: Wait for core-infra up
+    become: False
+    command: kubectl wait -n process-core --for=condition=Ready pod/{{ core_infra.stdout }} --timeout=360s
+
+  - name: Wait a bit more...
+    become: False
+    command: sleep 5
+
+  - name: Retrieve adminToken
+    become: False
+    command: kubectl cp -c web -n process-core {{ core_infra.stdout }}:/app/adminToken adminToken
+  
+  - name: Copy adminToken file to local file
+    fetch:
+        src: /home/vagrant/adminToken
+        dest: adminToken
+        flat: yes
+  
+  - name: Save adminToken
+    become: False
+    command: cat ./adminToken
+    register: token
+
+  - name: Setup default user
+    uri:
+        url: "http://localhost:30000/api/v1/user"
+        method: PUT
+        return_content: yes 
+        headers:
+            Content-Type: "application/json"
+            x-access-token: "{{ token.stdout }}"
+        body: '{"email": "user@process-project.eu","namespace": "user","staticPorts": {"scp": 31001,"webdav":31002,"jupyter":31003}}'
+        body_format: json
+        status_code: 200
+    register: user
+
+  - debug: User token
+      var: user.json.token
+  
+  - name: Read user-infra.json
+    become: False
+    local_action: command cat user-infra.json
+    register: infra
+
+  - name: Convert user-infra to json
+    set_fact:
+        userinfra: "{{ infra.stdout | from_json }}"
+
+  - debug:
+      var: userinfra
+
+  - name: Deploy user micro-infrastructure
+    uri:
+        url: "http://localhost:30000/api/v1/infrastructure"
+        method: POST
+        return_content: yes 
+        headers:
+            Content-Type: "application/json"
+            x-access-token: "{{ user.json.token }}"
+        body: "{{ userinfra }}"
+        body_format: json
+        status_code: 200
+    register: infraresult
+
+  - debug:
+      var: infraresult
+
+  - name: Wait a bit...
+    command: sleep 5
+  
+  - name: Get user-infra pod name
+    become: false
+    shell: kubectl get pods -n user | grep user-microinfra | grep -v Terminating |  awk '{print $1}'
+    register: user_infra_name
+
+  - debug:
+      var: user_infra_name.stdout
+
+  - name: Wait for core-infra up
+    become: False
+    command: kubectl wait -n user --for=condition=Ready pod/{{ user_infra_name.stdout }} --timeout=360s
