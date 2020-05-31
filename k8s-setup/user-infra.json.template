@@ -1,0 +1,56 @@
+{
+	"name": "user-microinfra",
+	"namespace": "user",
+	"storageAdaptorContainers": [
+			{
+			"name": "somename1",
+			"type": "sshfs",
+			"expose": "webdav",
+			"user": "USER",
+			"password":"*******",
+			"host": "HOST",
+			"path": "PATH_ON_HOST"
+		},
+			{
+			"name": "somename2",
+			"type": "sshfs",
+			"expose": "webdav",
+			"user": "USER",
+			"password":"*******",
+			"host": "HOST",
+			"path": "PATH_ON_HOST"
+		}
+		],
+	"initContainers": [],
+	"logicContainers": [
+		{
+			"name": "redis",
+			"type": "redis"
+		},
+		{
+			"name": "proxy",
+			"type": "proxy"
+		},
+		{
+			"name": "scp",
+			"type": "scp",
+			"service": {
+				"enabled": true
+			},
+			"env": [{}]
+		},
+		{
+			"name": "webdav",
+			"type": "webdav",
+			"config":{
+				"user": "process",
+				"pass": "thesame.",
+				"mountStorageAdaptors": true
+			},
+			"service":{
+				"enabled": true
+			}
+		}
+	]
+}
+
