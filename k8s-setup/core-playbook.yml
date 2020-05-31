@@ -86,7 +86,7 @@
 
   - name: Wait a bit more...
     become: False
-    command: sleep 5
+    command: sleep 10
 
   - name: Retrieve adminToken
     become: False
@@ -116,9 +116,6 @@
         status_code: 200
     register: user
 
-  - debug: User token
-      var: user.json.token
-  
   - name: Read user-infra.json
     become: False
     local_action: command cat user-infra.json
