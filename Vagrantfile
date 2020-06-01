@@ -13,6 +13,11 @@ Vagrant.configure("2") do |config|
         master.vm.box = IMAGE_NAME
         master.vm.network "private_network", ip: "192.168.50.10"
         master.vm.hostname = "k8s-master"
+
+		master.vm.provision "ansible" do |ansible|
+            ansible.playbook = "k8s-setup/check-list-playbook.yml"
+        end
+
         master.vm.provision "ansible" do |ansible|
             ansible.playbook = "k8s-setup/master-playbook.yml"
             ansible.extra_vars = {
@@ -23,6 +28,7 @@ Vagrant.configure("2") do |config|
 		master.vm.provision "ansible" do |ansible|
             ansible.playbook = "k8s-setup/core-playbook.yml"
         end
+
 		#master.vm.provision "ansible" do |ansible|
         #    ansible.playbook = "k8s-setup/test-playbook.yml"
         #end

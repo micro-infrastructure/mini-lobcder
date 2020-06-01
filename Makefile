@@ -1,8 +1,8 @@
 .PHONY: all
 
-clear:
+clean:
 	vagrant destroy -f
 
-build: clear
+build: clean
 	vagrant up
 
