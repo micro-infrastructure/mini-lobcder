@@ -2,27 +2,46 @@
 	"name": "user-microinfra",
 	"namespace": "user",
 	"storageAdaptorContainers": [
-			{
-			"name": "somename1",
+		{
+			"name": "myServer1",
 			"type": "sshfs",
 			"expose": "webdav",
-			"user": "USER",
-			"password":"*******",
-			"host": "HOST",
-			"path": "PATH_ON_HOST"
+			"user": "USERNAME",
+			"password":"******",
+			"host": "HOSTNAME",
+			"path": "PATH"
 		},
-			{
-			"name": "somename2",
+		{
+			"name": "myServer2",
 			"type": "sshfs",
 			"expose": "webdav",
-			"user": "USER",
-			"password":"*******",
-			"host": "HOST",
-			"path": "PATH_ON_HOST"
+			"user": "USERNAME",
+			"password":"******",
+			"host": "HOSTNAME",
+			"path": "PATH"
 		}
 		],
 	"initContainers": [],
 	"logicContainers": [
+			{
+			"name": "jupyter",
+			"type": "generic",
+			"image": "microinfrastructure/scipy-notebook",
+			"env":[
+				{ "name": "JPASSWD", "value": "Yy5Ob3RlYm9va0FwcC5wYXNzd29yZCA9IHUnc2hhMTpkYjkyZWM5ZTcxOTk6YjczZjMzZTlkYjhkYzAyYTdhM2MzNjMzODExNzRlZWUwNDUxZjViZSc=" }
+				],
+			"config": {
+				"mountStorageAdaptors": true,
+				"dataPath": "/data"
+			},
+			"mountHost": [
+			],
+			"port":8888,
+			"service":{
+				"enabled": true
+			},
+			"cmd":["echo $JPASSWD | base64 -d >> /home/jovyan/.jupyter/jupyter_notebook_config.py && cd /data && jupyter lab --allow-root"]
+		},
 		{
 			"name": "redis",
 			"type": "redis"
@@ -37,7 +56,10 @@
 			"service": {
 				"enabled": true
 			},
-			"env": [{}]
+			"env": [{
+				"name": "NETWORK",
+				"value": "e30="
+			}]
 		},
 		{
 			"name": "webdav",

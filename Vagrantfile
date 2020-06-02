@@ -29,9 +29,9 @@ Vagrant.configure("2") do |config|
             ansible.playbook = "k8s-setup/core-playbook.yml"
         end
 
-		#master.vm.provision "ansible" do |ansible|
-        #    ansible.playbook = "k8s-setup/test-playbook.yml"
-        #end
+#		master.vm.provision "ansible" do |ansible|
+#            ansible.playbook = "k8s-setup/test-playbook.yml"
+#        end
 
     end
 
