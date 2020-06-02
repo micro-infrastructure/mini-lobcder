@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault
+  namespace: process-core
+type: Opaque
+data:
+    dbpass: #DBPASS#
+    dbuser: #DBUSER#
+    db-root-user: cm9vdAo=
+    db-root-pass: #DB-ROOT-PASS#
+    publicKey.txt: #PUBLICKEY.TXT#
+    privateKey.txt: #PRIVATEKEY.TXT#
+    certificate.txt: #CERTIFICATE.TXT#
+    config: #CONFIG#
+    core-infra-config.json: #CORE-INFRA-CONFIG.JSON#
