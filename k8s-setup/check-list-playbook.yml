@@ -1,0 +1,6 @@
+---
+- hosts: all
+  become: false
+  tasks:
+  - name: Check if k8s-setup/user-infra.json exists
+    local_action: shell stat user-infra.json
