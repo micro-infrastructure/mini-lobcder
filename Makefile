@@ -1,7 +1,10 @@
 .PHONY: all
 
+
 clean:
 	vagrant destroy -f
+
+destroy: clean
 
 build: clean
 	vagrant up
