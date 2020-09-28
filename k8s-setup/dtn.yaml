@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dtn
+  namespace: process-dtn
+spec:
+  selector:
+    name: core-dtn
+  ports:
+  - port: 22
+    targetPort: 22
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: process-dtn
+  name: core-dtn
+  labels:
+    name: core-dtn
+spec:
+  hostname: dtn
+  containers:
+    - name: core-dtn
+        image: panubo/sshd 
+      ports:
+        - containerPort: 22
+
