@@ -5,7 +5,7 @@ Mini-LOBCDER is a VM of LOBCDER to deploy micro-infrastructures locally. The set
 ## Installation
 - Install Vagrant, VirtualBox,  GIT for Ubuntu:
 
-`apt-get install vagrant virtualbox git`
+`apt-get install vagrant virtualbox git ansible`
 - Clone the mini-lobcder
 
 `git clone --branch 0.1.0 https://github.com/micro-infrastructure/mini-lobcder.git`
@@ -37,4 +37,14 @@ The copy service is used to do 3rd party copies between your storage nodes. For 
 ## User-infra description file
 This file describes the micro-infrastructure for the user or application. For more information how to build the file visit [lobcder-core-infra](https://github.com/micro-infrastructure/core-infra)
 
+## Services with callback
+Some services require a public interface to receive callbacks. For local deployments [ngrok](https://ngrok.com) can be used to create these.
+
+For `lofar-download`, create a tunnel to the Vagrant VM from the host machine and specify the port of the service:
+
+```shell
+$ ngrok http 192.168.50.10:31005
+```
+
+Then set the `LOFARDOWNLOAD_SERVICE` environment variable in the `user-infra.json` file (see `k8s-setup/user-infra.json.template-lofar`) to the forwarding URL ngrok provides.
 

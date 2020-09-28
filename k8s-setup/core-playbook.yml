@@ -86,7 +86,7 @@
 
   - name: Wait a bit more...
     become: False
-    command: sleep 10
+    command: sleep 30
 
   - name: Retrieve adminToken
     become: False
@@ -111,7 +111,7 @@
         headers:
             Content-Type: "application/json"
             x-access-token: "{{ token.stdout }}"
-        body: '{"email": "user@process-project.eu","namespace": "user","staticPorts": {"scp": 31001,"webdav":31002,"jupyter":31003}}'
+        body: '{"email": "user@process-project.eu","namespace": "user","staticPorts": {"scp": 31001,"webdav":31002,"jupyter":31003, "lofar-stage": 31004, "lofar-download": 31005}}'
         body_format: json
         status_code: 200
     register: user
@@ -149,7 +149,7 @@
       var: infraresult
 
   - name: Wait a bit...
-    command: sleep 5
+    command: sleep 30
   
   - name: Get micro-infrastrucuture info
     uri:
@@ -163,6 +163,9 @@
         body_format: json
         status_code: 200
     register: services
+
+  - debug:
+      var: services
   
   - name: Save service user token locally
     become: false
