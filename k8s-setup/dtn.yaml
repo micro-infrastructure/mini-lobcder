@@ -21,7 +21,10 @@ spec:
   hostname: dtn
   containers:
     - name: core-dtn
-      image: panubo/sshd 
+      image: microinfrastructure/sshd:default
+      env:
+        - name: SSH_ENABLE_PASSWORD_AUTH
+          value: "true"
       ports:
         - containerPort: 22
 
