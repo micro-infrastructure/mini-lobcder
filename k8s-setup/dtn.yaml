@@ -21,7 +21,7 @@ spec:
   hostname: dtn
   containers:
     - name: core-dtn
-        image: panubo/sshd 
+      image: panubo/sshd 
       ports:
         - containerPort: 22
 
